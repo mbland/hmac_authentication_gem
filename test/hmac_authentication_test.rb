@@ -73,7 +73,7 @@ module HmacAuthentication
 
     # rubocop:disable MethodLength
     def test_request_signature_get
-      uri = URI 'http://localhost/foo/bar'
+      uri = URI 'http://localhost/foo/bar?baz=quux#xyzzy'
       req = Net::HTTP::Get.new uri
       req['Date'] = '2015-09-29'
       req['Cookie'] = 'foo; bar; baz=quux'
@@ -91,12 +91,45 @@ module HmacAuthentication
          '',
          'foo; bar; baz=quux',
          'mbland',
+         '/foo/bar?baz=quux#xyzzy',
+        ].join("\n"),
+        HmacAuthentication.string_to_sign(req, HEADERS))
+
+      assert_equal(
+        'sha1 gw1nuRYzkocv5q8nQSo3pT5F970=',
+        HmacAuthentication.request_signature(req, digest, HEADERS, 'foobar'))
+    end
+    # rubocop:enable MethodLength
+
+    # rubocop:disable MethodLength
+    def test_request_signature_get_with_multiple_values_for_header
+      uri = URI 'http://localhost/foo/bar'
+      req = Net::HTTP::Get.new uri
+      req['Date'] = '2015-09-29'
+      # Note that Net::HTTPHeader only honors the last header with the same
+      # name, discarding earlier values. We can still approximate a cookie
+      # with multiple values using the representation below.
+      req['Cookie'] = ['foo', 'bar', 'baz=quux']
+      req['Gap-Auth'] = 'mbland'
+
+      assert_equal(
+        ['GET',
+         '',
+         '',
+         '',
+         '2015-09-29',
+         '',
+         '',
+         '',
+         '',
+         'foo,bar,baz=quux',
+         'mbland',
          '/foo/bar',
         ].join("\n"),
         HmacAuthentication.string_to_sign(req, HEADERS))
 
       assert_equal(
-        'sha1 JBQJcmSTteQyHZXFUA9glis9BIk=',
+        'sha1 VnoxQC+mg2Oils+Cbz1j1c9LXLE=',
         HmacAuthentication.request_signature(req, digest, HEADERS, 'foobar'))
     end
     # rubocop:enable MethodLength

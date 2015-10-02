@@ -9,12 +9,18 @@ module HmacAuthentication
   MISMATCH = 5
 
   def self.signed_headers(request, headers)
-    headers.map { |name| request[name] || '' }
+    headers.map { |name| (request.get_fields(name) || []).join(',') }
+  end
+
+  def self.hash_url(req)
+    result = "#{req.uri.path}"
+    result << '?' << req.uri.query if req.uri.query
+    result << '#' << req.uri.fragment if req.uri.fragment
+    result
   end
 
   def self.string_to_sign(req, headers)
-    # TODO(mbland): Test for paths of the form 'http://foo.com/bar?baz'
-    [req.method, signed_headers(req, headers).join("\n"), req.uri.path]
+    [req.method, signed_headers(req, headers).join("\n"), hash_url(req)]
       .join("\n")
   end
 
