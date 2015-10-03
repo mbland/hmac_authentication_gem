@@ -36,8 +36,8 @@ module HmacAuthentication
     nil
   end
 
-  def self.validate_request(request, headers, secret_key)
-    header = request['Gap-Signature']
+  def self.validate_request(request, signatureHeader, headers, secret_key)
+    header = request[signatureHeader]
     return NO_SIGNATURE unless header
     components = header.split ' '
     return INVALID_FORMAT, header unless components.size == 2

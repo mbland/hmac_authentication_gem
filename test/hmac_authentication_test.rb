@@ -150,7 +150,8 @@ module HmacAuthentication
     end
 
     def validate_request(secret_key)
-      HmacAuthentication.validate_request request, HEADERS, secret_key
+      HmacAuthentication.validate_request(
+        request, 'Gap-Signature', HEADERS, secret_key)
     end
 
     def test_validate_request_no_signature
