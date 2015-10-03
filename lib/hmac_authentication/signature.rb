@@ -67,6 +67,10 @@ module HmacAuthentication
     end
     private :request_signature_impl
 
+    def signature_from_header(request)
+      request[signature_header]
+    end
+
     def parse_digest(name)
       OpenSSL::Digest.new name
     rescue
@@ -75,7 +79,7 @@ module HmacAuthentication
     private :parse_digest
 
     def validate_request(request)
-      header = request[signature_header]
+      header = signature_from_header request
       return NO_SIGNATURE unless header
       components = header.split ' '
       return INVALID_FORMAT, header unless components.size == 2
