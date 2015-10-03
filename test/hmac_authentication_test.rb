@@ -200,7 +200,7 @@ module HmacAuthentication
 
     def test_validate_request_match
       expected_signature = auth.request_signature request
-      request['GAP-Signature'] = expected_signature
+      auth.sign_request request
       result, header, computed = auth.validate_request request
       assert_equal HmacAuth::MATCH, result
       assert_equal expected_signature, header
@@ -208,14 +208,12 @@ module HmacAuthentication
     end
 
     def test_validate_request_mismatch
-      foobar_signature = auth.request_signature request
       barbaz_auth = HmacAuth.new 'sha1', 'barbaz', 'Gap-Signature', HEADERS
-      barbaz_signature = barbaz_auth.request_signature request
-      request['GAP-Signature'] = foobar_signature
+      auth.sign_request request
       result, header, computed = barbaz_auth.validate_request request
       assert_equal HmacAuth::MISMATCH, result
-      assert_equal foobar_signature, header
-      assert_equal barbaz_signature, computed
+      assert_equal auth.request_signature(request), header
+      assert_equal barbaz_auth.request_signature(request), computed
     end
   end
 end

@@ -52,6 +52,10 @@ module HmacAuthentication
       [req.method, signed_headers(req).join("\n"), hash_url(req)].join("\n")
     end
 
+    def sign_request(req)
+      req[signature_header] = request_signature req
+    end
+
     def request_signature(request)
       hmac = OpenSSL::HMAC.new secret_key, digest
       hmac << string_to_sign(request) << (request.body || '')
