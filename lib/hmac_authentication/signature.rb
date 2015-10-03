@@ -11,6 +11,19 @@ module HmacAuthentication
     MATCH = 4
     MISMATCH = 5
 
+    RESULT_CODE_STRINGS = %w(
+      NO_SIGNATURE
+      INVALID_FORMAT
+      UNSUPPORTED_ALGORITHM
+      MATCH
+      MISMATCH
+    )
+
+    def self.result_code_to_string(code)
+      index = code - 1
+      index >= 0 ? RESULT_CODE_STRINGS[index] : nil
+    end
+
     def initialize(digest_name, secret_key, signature_header, headers)
       @digest = parse_digest digest_name
       if digest.nil?

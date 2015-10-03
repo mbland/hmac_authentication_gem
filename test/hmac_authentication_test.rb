@@ -27,6 +27,24 @@ module HmacAuthenticationTest
 end
 
 module HmacAuthentication
+  class ValidationResultCodeTest < ::Minitest::Test
+    def test_return_nil_for_out_of_range_values
+      assert_nil HmacAuth.result_code_to_string(-1)
+      assert_nil(
+        HmacAuth.result_code_to_string(
+          HmacAuth::RESULT_CODE_STRINGS.size + 1))
+    end
+
+    def test_return_string_for_valid_values
+      assert_equal('NO_SIGNATURE',
+        HmacAuth.result_code_to_string(HmacAuth::NO_SIGNATURE))
+      assert_equal('MISMATCH',
+        HmacAuth.result_code_to_string(HmacAuth::MISMATCH))
+      assert_equal('MISMATCH',
+        HmacAuth.result_code_to_string(HmacAuth::RESULT_CODE_STRINGS.size))
+    end
+  end
+
   class HmacAuthConstructorTest < ::Minitest::Test
     include HmacAuthenticationTest
 
