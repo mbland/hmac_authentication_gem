@@ -24,10 +24,15 @@ making the request:
 ```ruby
 require 'hmac_authentication'
 
-def my_handler(request, headers)
-  result, header_signature, computed_signature = (
-    HmacAuthentication.validate_request(request, headers, secret_key))
-  if result != HmacAuthentication::MATCH
+# When only used for validation, it doesn't matter what the first argument is,
+# because the hash algorithm used for validation will be parsed from the
+# incoming request signature header.
+auth = HmacAuthentication::HmacAuth.new(
+  'sha1', secret_key, signature_header, headers)
+
+def request_handler(request)
+  result, header_signature, computed_signature = auth.validate_request request
+  if result != HmacAuthentication::HmacAuth::MATCH
     # Cancel the request, optionally logging the values above.
   end
 end
@@ -35,8 +40,18 @@ end
 
 ## Signing outgoing requests
 
-Call `request_signature(request, headers, secretKey)` to sign a request before
-sending.
+Do something similar to the following.
+
+```ruby
+digest_name = 'sha1' # Or any other available Hash algorithm.
+auth = HmacAuthentication::HmacAuth.new(
+  digest_name, secret_key, signature_header, headers)
+
+def make_request(request)
+  // Prepare request...
+  auth.sign_request request
+end
+```
 
 ## Public domain
 
