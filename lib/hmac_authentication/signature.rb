@@ -57,10 +57,15 @@ module HmacAuthentication
     end
 
     def request_signature(request)
-      hmac = OpenSSL::HMAC.new secret_key, digest
-      hmac << string_to_sign(request) << (request.body || '')
-      digest.name.downcase + ' ' + Base64.strict_encode64(hmac.digest)
+      request_signature_impl request, digest
     end
+
+    def request_signature_impl(request, digest_)
+      hmac = OpenSSL::HMAC.new secret_key, digest_
+      hmac << string_to_sign(request) << (request.body || '')
+      digest_.name.downcase + ' ' + Base64.strict_encode64(hmac.digest)
+    end
+    private :request_signature_impl
 
     def parse_digest(name)
       OpenSSL::Digest.new name
@@ -74,9 +79,9 @@ module HmacAuthentication
       return NO_SIGNATURE unless header
       components = header.split ' '
       return INVALID_FORMAT, header unless components.size == 2
-      digest = parse_digest components.first
-      return UNSUPPORTED_ALGORITHM, header unless digest
-      computed = request_signature request
+      parsed_digest = parse_digest components.first
+      return UNSUPPORTED_ALGORITHM, header unless parsed_digest
+      computed = request_signature_impl request, parsed_digest
       [(header == computed) ? MATCH : MISMATCH, header, computed]
     end
   end
