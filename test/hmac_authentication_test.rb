@@ -27,6 +27,18 @@ module HmacAuthenticationTest
 end
 
 module HmacAuthentication
+  class HmacAuthConstructorTest < ::Minitest::Test
+    include HmacAuthenticationTest
+
+    def test_constructor_fails_if_digest_is_not_supported
+      HmacAuthentication::HmacAuth.new(
+        'bogus', 'foobar', 'Gap-Signature', HEADERS)
+    rescue RuntimeError => err
+      assert_equal(
+        'HMAC authentication digest is not supported: bogus', err.to_s)
+    end
+  end
+
   class RequestSignatureTest < ::Minitest::Test
     include HmacAuthenticationTest
 

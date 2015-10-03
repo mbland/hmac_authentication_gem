@@ -11,8 +11,12 @@ module HmacAuthentication
     MATCH = 4
     MISMATCH = 5
 
-    def initialize(digest, secret_key, signature_header, headers)
-      @digest = parse_digest digest
+    def initialize(digest_name, secret_key, signature_header, headers)
+      @digest = parse_digest digest_name
+      if digest.nil?
+        fail "HMAC authentication digest is not supported: #{digest_name}"
+      end
+
       @secret_key = secret_key
       @signature_header = signature_header
       @headers = headers
