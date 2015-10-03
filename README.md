@@ -2,6 +2,19 @@
 
 Signs and validates HTTP requests based on a shared-secret HMAC signature.
 
+Developed in parallel with the following packages for other languages:
+- Go: [github.com/18F/hmacauth](https://github.com/18F/hmacauth/)
+- Node.js: [hmac-authentication](https://www.npmjs.com/package/hmac-authentication)
+
+**Warning: Repeated HTTP headers will cause an authentication failure!**
+Because of the way that Ruby's
+[Net::HTTPHeader.initialize_http_header](https://github.com/rubysl/rubysl-net-http/blob/2.0/lib/net/http/header.rb)
+method is implemented, it will discard all but the last of a series of
+repeated headers. The packages for other languages will combine repeated
+headers into one. Therefore, if your Ruby service receives an signed request
+from a server using one of these other modules, and the request has repeated
+headers, authentication of the request will fail.
+
 ## Installation
 
 If you're using [Bundler](http://bundler.io) in your project, add the
