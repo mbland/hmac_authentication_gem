@@ -1,4 +1,5 @@
 require 'base64'
+require 'fast_secure_compare/fast_secure_compare'
 require 'openssl'
 
 module HmacAuthentication
@@ -78,6 +79,11 @@ module HmacAuthentication
     end
     private :parse_digest
 
+    def compare_signatures(header, computed)
+      FastSecureCompare.compare(computed, header) ? MATCH : MISMATCH
+    end
+    private :compare_signatures
+
     def validate_request(request)
       header = signature_from_header request
       return NO_SIGNATURE unless header
@@ -86,7 +92,7 @@ module HmacAuthentication
       parsed_digest = parse_digest components.first
       return UNSUPPORTED_ALGORITHM, header unless parsed_digest
       computed = request_signature_impl request, parsed_digest
-      [(header == computed) ? MATCH : MISMATCH, header, computed]
+      [compare_signatures(header, computed), header, computed]
     end
   end
 end

@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
 
   s.add_runtime_dependency 'bundler', '~> 1.10'
+  s.add_runtime_dependency 'fast_secure_compare'
   s.add_development_dependency 'go_script', '~> 0.1'
   s.add_development_dependency 'rake', '~> 10.4'
   s.add_development_dependency 'minitest'
