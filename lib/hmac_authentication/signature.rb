@@ -50,7 +50,8 @@ module HmacAuthentication
     private :hash_url
 
     def string_to_sign(req)
-      [req.method, signed_headers(req).join("\n"), hash_url(req)].join("\n")
+      [req.method, signed_headers(req).join("\n"), hash_url(req)]
+        .join("\n") + "\n"
     end
 
     def sign_request(req)

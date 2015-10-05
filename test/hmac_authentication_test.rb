@@ -91,10 +91,10 @@ module HmacAuthentication
          'foo; bar; baz=quux',
          'mbland',
          '/foo/bar',
-        ].join("\n"),
+        ].join("\n") + "\n",
         auth.string_to_sign(req))
       assert_equal(
-        'sha1 722UbRYfC6MnjtIxqEJMDPrW2mk=',
+        'sha1 K4IrVDtMCRwwW8Oms0VyZWMjXHI=',
         auth.request_signature(req))
     end
     # rubocop:enable Metrics/AbcSize
@@ -102,7 +102,7 @@ module HmacAuthentication
 
     # rubocop:disable MethodLength
     def test_request_signature_get
-      uri = URI 'http://localhost/foo/bar?baz=quux#xyzzy'
+      uri = URI 'http://localhost/foo/bar?baz=quux%2Fxyzzy#plugh'
       req = Net::HTTP::Get.new uri
       req['Date'] = '2015-09-29'
       req['Cookie'] = 'foo; bar; baz=quux'
@@ -120,12 +120,12 @@ module HmacAuthentication
          '',
          'foo; bar; baz=quux',
          'mbland',
-         '/foo/bar?baz=quux#xyzzy',
-        ].join("\n"),
+         '/foo/bar?baz=quux%2Fxyzzy#plugh',
+        ].join("\n") + "\n",
         auth.string_to_sign(req))
 
       assert_equal(
-        'sha1 gw1nuRYzkocv5q8nQSo3pT5F970=',
+        'sha1 ih5Jce9nsltry63rR4ImNz2hdnk=',
         auth.request_signature(req))
     end
     # rubocop:enable MethodLength
@@ -154,11 +154,11 @@ module HmacAuthentication
          'foo,bar,baz=quux',
          'mbland',
          '/foo/bar',
-        ].join("\n"),
+        ].join("\n") + "\n",
         auth.string_to_sign(req))
 
       assert_equal(
-        'sha1 VnoxQC+mg2Oils+Cbz1j1c9LXLE=',
+        'sha1 JlRkes1X+qq3Bgc/GcRyLos+4aI=',
         auth.request_signature(req))
     end
     # rubocop:enable MethodLength
