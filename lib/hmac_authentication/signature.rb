@@ -17,13 +17,13 @@ module HmacAuthentication
     MISMATCH
   )
 
+  def self.result_code_to_string(code)
+    index = code - 1
+    index >= 0 ? RESULT_CODE_STRINGS[index] : nil
+  end
+
   class HmacAuth
     attr_reader :digest, :secret_key, :signature_header, :headers
-
-    def self.result_code_to_string(code)
-      index = code - 1
-      index >= 0 ? RESULT_CODE_STRINGS[index] : nil
-    end
 
     def initialize(digest_name, secret_key, signature_header, headers)
       @digest = HmacAuthentication.parse_digest digest_name
