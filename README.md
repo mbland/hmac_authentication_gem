@@ -1,6 +1,6 @@
 # hmac_authentication RubyGem
 
-Signs and validates HTTP requests based on a shared-secret HMAC signature.
+Signs and authenticates HTTP requests based on a shared-secret HMAC signature.
 
 Developed in parallel with the following packages for other languages:
 - Go: [github.com/18F/hmacauth](https://github.com/18F/hmacauth/)
@@ -26,7 +26,7 @@ gem 'hmac_authentication'
 
 If you're not using Bundler, start.
 
-## Validating incoming requests
+## Authenticating incoming requests
 
 Inject something resembling the following code fragment into your request
 handling logic as the first thing that happens before the request body is
@@ -37,14 +37,14 @@ making the request:
 ```ruby
 require 'hmac_authentication'
 
-# When only used for validation, it doesn't matter what the first argument is,
-# because the hash algorithm used for validation will be parsed from the
-# incoming request signature header.
+# When only used for authentication, it doesn't matter what the first argument
+# is, because the hash algorithm used for authentication will be parsed from
+# the incoming request signature header.
 auth = HmacAuthentication::HmacAuth.new(
   'sha1', secret_key, signature_header, headers)
 
 def request_handler(request)
-  result, header_signature, computed_signature = auth.validate_request request
+  result, header_sig, computed_sig = auth.authenticate_request request
   if result != HmacAuthentication::HmacAuth::MATCH
     # Cancel the request, optionally logging the values above.
   end

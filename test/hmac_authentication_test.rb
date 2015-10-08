@@ -27,21 +27,18 @@ module HmacAuthenticationTest
 end
 
 module HmacAuthentication
-  class ValidationResultCodeTest < ::Minitest::Test
+  class AuthenticationResultCodeTest < ::Minitest::Test
     def test_return_nil_for_out_of_range_values
       assert_nil HmacAuth.result_code_to_string(-1)
       assert_nil(
-        HmacAuth.result_code_to_string(
-          HmacAuth::RESULT_CODE_STRINGS.size + 1))
+        HmacAuth.result_code_to_string(RESULT_CODE_STRINGS.size + 1))
     end
 
     def test_return_string_for_valid_values
-      assert_equal('NO_SIGNATURE',
-        HmacAuth.result_code_to_string(HmacAuth::NO_SIGNATURE))
+      assert_equal('NO_SIGNATURE', HmacAuth.result_code_to_string(NO_SIGNATURE))
+      assert_equal('MISMATCH', HmacAuth.result_code_to_string(MISMATCH))
       assert_equal('MISMATCH',
-        HmacAuth.result_code_to_string(HmacAuth::MISMATCH))
-      assert_equal('MISMATCH',
-        HmacAuth.result_code_to_string(HmacAuth::RESULT_CODE_STRINGS.size))
+        HmacAuth.result_code_to_string(RESULT_CODE_STRINGS.size))
     end
   end
 
@@ -164,54 +161,54 @@ module HmacAuthentication
     # rubocop:enable MethodLength
   end
 
-  class ValidateRequestTest < ::Minitest::Test
+  class AuthenticateRequestTest < ::Minitest::Test
     include HmacAuthenticationTest
 
     def request
       @request ||= Net::HTTP::Post.new URI('http://localhost/foo/bar')
     end
 
-    def test_validate_request_no_signature
-      result, header, computed = auth.validate_request request
-      assert_equal HmacAuth::NO_SIGNATURE, result
+    def test_authenticate_request_no_signature
+      result, header, computed = auth.authenticate_request request
+      assert_equal NO_SIGNATURE, result
       assert_nil header
       assert_nil computed
     end
 
-    def test_validate_request_invalid_format
+    def test_authenticate_request_invalid_format
       bad_value = 'should be algorithm and digest value'
       request['GAP-Signature'] = bad_value
-      result, header, computed = auth.validate_request request
-      assert_equal HmacAuth::INVALID_FORMAT, result
+      result, header, computed = auth.authenticate_request request
+      assert_equal INVALID_FORMAT, result
       assert_equal bad_value, header
       assert_nil computed
     end
 
-    def test_validate_request_unsupported_algorithm
+    def test_authenticate_request_unsupported_algorithm
       valid_signature = auth.request_signature request
       components = valid_signature.split ' '
       signature_with_unsupported_algorithm = "unsupported #{components.last}"
       request['GAP-Signature'] = signature_with_unsupported_algorithm
-      result, header, computed = auth.validate_request request
-      assert_equal HmacAuth::UNSUPPORTED_ALGORITHM, result
+      result, header, computed = auth.authenticate_request request
+      assert_equal UNSUPPORTED_ALGORITHM, result
       assert_equal signature_with_unsupported_algorithm, header
       assert_nil computed
     end
 
-    def test_validate_request_match
+    def test_authenticate_request_match
       expected_signature = auth.request_signature request
       auth.sign_request request
-      result, header, computed = auth.validate_request request
-      assert_equal HmacAuth::MATCH, result
+      result, header, computed = auth.authenticate_request request
+      assert_equal MATCH, result
       assert_equal expected_signature, header
       assert_equal expected_signature, computed
     end
 
-    def test_validate_request_mismatch
+    def test_authenticate_request_mismatch
       barbaz_auth = HmacAuth.new 'sha1', 'barbaz', 'Gap-Signature', HEADERS
       auth.sign_request request
-      result, header, computed = barbaz_auth.validate_request request
-      assert_equal HmacAuth::MISMATCH, result
+      result, header, computed = barbaz_auth.authenticate_request request
+      assert_equal MISMATCH, result
       assert_equal auth.request_signature(request), header
       assert_equal barbaz_auth.request_signature(request), computed
     end
