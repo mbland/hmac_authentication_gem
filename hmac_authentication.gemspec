@@ -7,13 +7,13 @@ Gem::Specification.new do |s|
   s.name          = 'hmac_authentication'
   s.version       = HmacAuthentication::VERSION
   s.authors       = ['Mike Bland']
-  s.email         = ['michael.bland@gsa.gov']
+  s.email         = ['mbland@acm.org']
   s.summary       = 'Signs and validates HTTP requests using HMAC signatures'
   s.description   = (
     'Signs and validates HTTP requests based on a shared-secret HMAC signature'
   )
-  s.homepage      = 'https://github.com/18F/hmac_authentication_gem'
-  s.license       = 'CC0'
+  s.homepage      = 'https://github.com/mbland/hmac_authentication_gem'
+  s.license       = 'ISC'
 
   s.files         = `git ls-files -z *.md bin lib`.split("\x0") + [
   ]
